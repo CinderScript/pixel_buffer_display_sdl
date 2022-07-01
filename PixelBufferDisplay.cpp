@@ -1,8 +1,8 @@
 #include "PixelBufferDisplay.h"
 
 
-PixelBufferDisplay::PixelBufferDisplay(int windowHeight, int windowWidth, void (*bufferUpdater)(Uint32*))
-    : height(windowHeight), width(windowWidth), update(bufferUpdater), quit(false) {
+PixelBufferDisplay::PixelBufferDisplay(int windowHeight, int windowWidth)
+    : height(windowHeight), width(windowWidth) {
 
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -14,7 +14,7 @@ PixelBufferDisplay::PixelBufferDisplay(int windowHeight, int windowWidth, void (
         SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
     pixelBuffer = new Uint32[height * width];
 
-    memset(pixelBuffer, 255, height * width * sizeof(Uint32));
+    memset(pixelBuffer, 0, height * width * sizeof(Uint32)); // set to black
 }
 
 PixelBufferDisplay::~PixelBufferDisplay() {
@@ -26,21 +26,15 @@ PixelBufferDisplay::~PixelBufferDisplay() {
     SDL_Quit();
 }
 
-void PixelBufferDisplay::SetBuffer() {
+void PixelBufferDisplay::SetBuffer(const Uint32* buffer) {
+    memcpy(pixelBuffer, buffer, height * width * sizeof(Uint32));
+}
 
-    while (!quit) {
-        SDL_UpdateTexture(texture, NULL, pixelBuffer, width * sizeof(Uint32));
+void PixelBufferDisplay::UpdateDisplay() {
 
-        SDL_WaitEvent(&event);
+    SDL_UpdateTexture(texture, NULL, pixelBuffer, width * sizeof(Uint32));
 
-        if (event.type == SDL_QUIT) {
-            quit = true;
-        }
-
-        update(pixelBuffer);
-
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
-        SDL_RenderPresent(renderer);
-    }
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_RenderPresent(renderer);
 }

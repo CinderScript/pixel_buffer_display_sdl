@@ -8,11 +8,7 @@ class PixelBufferDisplay {
 private:
     uint16_t    height;
     uint16_t    width;
-    /**
-     * @brief Update callback for updating the pixelBuffer.
-     *
-     */
-    void (*update)(Uint32*);
+
     /**
      * @brief Buffer that SDL will display in the window.
      *       Passed to the bufferUpdater callback to update
@@ -26,11 +22,9 @@ private:
     SDL_Texture* texture;
     SDL_Event event;
 
-    bool quit;
-
 public:
-    PixelBufferDisplay(int windowHeight, int windowWidth, void (*bufferUpdater)(Uint32*));
+    PixelBufferDisplay(int windowHeight, int windowWidth);
     ~PixelBufferDisplay();
-    void SetUpdater();
-    void SetBuffer();
+    void SetBuffer(const Uint32* pixelBuffer);
+    void UpdateDisplay();
 };
